@@ -5,6 +5,10 @@
 <head>
     <title>欢迎注册</title>
     <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css">
+    <!-- 引入jquery -->
+    <script src="../js/jquery.min.js"></script>
+    <!-- 引入密码加密包 md5 -->
+    <script src="../js/md5.js"></script>
 </head>
 
 <body>
@@ -39,5 +43,43 @@
     </div>
 </body>
 <script>
+    //注册
+    function register (){
+        const username = $('#usernameId').val();
+        // const password = $('#passwordId').val()
+        //用md5加密
+        const password = $.md5($('#passwordId').val()+"&*$#@_1314")
+
+        //发送ajax请求
+        $.post('/account/register',{username,password},function (result) {  
+            console.log(result);
+            if(result.status!=0){
+                //失败
+                alert(result.message);
+            }else{
+                //跳转到登录页面进行登录
+                location.href = '/account/login'
+            }
+        })
+    }
+
+    function register() {  
+        //获取用户名和密码 密码使用md5 加密 记得加盐
+        const username = $('#usernameId').val()
+        const password = $.md5($('#passwordId').val()+'!@#$%^')
+
+        //把用户名和密码作为参数, 通过ajax请求发送给服务器
+        $.post('/account/register',{username,password},function (res) {  
+            console.log(res);
+            if(res != 0 ){
+                //注册失败, 提示用户
+                alert(res.message)
+            }else{
+                //成功, 跳转到登录页面
+                location.href = '/account/login'
+            }
+        })
+    }
+
 </script>
 </html>

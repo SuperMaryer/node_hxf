@@ -36,9 +36,13 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')))
 
 
-//导入路由对象
+//导入登录注册路由对象
 const accountRouter = require(path.join(__dirname, './routers/accountRouter.js'))
 app.use('/account', accountRouter)
+
+//导入学生管理路由对象
+const studentManegeRouter = require(path.join(__dirname, './routers/studentManegeRouter.js'))
+app.use('/studentmanege', studentManegeRouter)
 
 
 

@@ -1,16 +1,10 @@
 const path = require("path");
 
-//数据库使用: 导入数据库
-const MongoClient = require("mongodb").MongoClient;
+//数据库使用: 导入数据库//导入封装好的tool 的 databasetool
+const databasetool = require(path.join(__dirname, '../tools/databasetool'))
+
 //导入获取验证码图片的第三方包
 const captchapng = require('captchapng')
-
-// Connection URL
-const url = 'mongodb://localhost:27017';
-
-// Database Name  数据库名称
-const dbName = 'szhmqd27';
-
 
 
 //导出一个方法, 该方法获取注册页面
@@ -34,7 +28,32 @@ exports.register = (req, res) => {
 
     //判断, 用户名存在: 提示用户, 用户名不存在: 插入一条, 注册成功  操作数据库, mongodb
 
+    //利用封装的查找一条函数: 查找是否存在 
+    databasetool.findYige('accountInfo', {
+        username
+    }, (err, result1) => {
+        if (result1) {
+            //查询到有数据
+            result.status = 1,
+                result.message = "用户名已存在"
+            //返回数据
+            res.json(result)
+        } else {
+            //不存在, 新增一条 result2有值: 新增成功, 返回null:失败
+            databasetool.insertYige('accountInfo', req.body, (err, result2) => {
+                if (!result2) {
+                    //失败
+                    result.status = 2,
+                    result.message = "注册失败"
+                }
+                //返回数据
+                res.json(result)
+            })
+        }
+    })
+
     // Use connect method to connect to the server
+    /*
     MongoClient.connect(url, function (err, client) {
         console.log("Connected successfully to server");
 
@@ -73,6 +92,7 @@ exports.register = (req, res) => {
 
         })
     })
+    */
 }
 
 //获取登录页面
@@ -124,9 +144,25 @@ exports.login = (req, res) => {
     }
 
     //来到这里说明验证码正确, 判断账号密码是否正确
-    //查询一个数据 , 没有数据返回null
+    //查询一个数据 , 没有数据返回null 
+    //使用封装好的方法
+    databasetool.findYige('accountInfo', {
+        username,
+        password
+    }, (err, result1) => {
+        if (!result1) {
+            //没有查到: 登录失败
+            result.status = 2
+            result.message = '账号或者密码错误'
+        }
+        //返回数据
+        res.json(result);
+    })
+
+
     // Use connect method to connect to the server
-    MongoClient.connect(url, function (err, client) {
+    /*
+     MongoClient.connect(url, function (err, client) {
 
         console.log("Connected successfully to server");
 
@@ -153,6 +189,7 @@ exports.login = (req, res) => {
             res.json(result);
         })
 
-    });
+    })
+    */
 
 }
